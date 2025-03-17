@@ -1,0 +1,37 @@
+modules:
+  jira:issuePanel:
+    - key: issue-panel-redirect-hello-world-panel
+      resource: main
+      resolver:
+        function: resolver
+      viewportSize: medium
+      title: issue-panel-redirect
+      icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: static/hello-world/build
+permissions:
+  scopes:
+    - read:jira-work
+  content:
+    styles:
+      - 'unsafe-inline'
+  external:
+    images:
+      - '*.openstreetmap.org'
+      - '*.tile.openstreetmap.org'
+      - '*.leafletjs.com'
+    frames:
+      - 'https://www.google.com/maps/dir/*'
+    fetch:
+      client:
+        - '*.openstreetmap.org'
+        - '*.tile.openstreetmap.org'
+        - 'https://www.google.com'
+app:
+  runtime:
+    name: nodejs22.x
+  id: ari:cloud:ecosystem::app/06aa71f8-1890-46aa-93e0-3c03894dc315
