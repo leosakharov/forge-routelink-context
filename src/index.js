@@ -7,6 +7,18 @@ resolver.define('fetchIssueDetails', async (req) => {
     console.log('Fetching issue details...');
     const key = req.context.extension.issue.key;
     console.log(`Issue key: ${key}`);
+    
+    /*
+    // Check if we're on the specific site
+    const siteUrl = req.context.extension.site?.url || '';
+    console.log(`Site URL: ${siteUrl}`);
+    const isTargetSite = siteUrl.includes('haulier-semanticbiz.atlassian.net');
+    
+    if (!isTargetSite) {
+      console.log('Not on target site, panel will not be shown');
+      return null;
+    }
+    */
 
     const res = await api.asUser().requestJira(route`/rest/api/3/issue/${key}`);
     
@@ -44,6 +56,14 @@ resolver.define('fetchIssueDetails', async (req) => {
       return null;
     }
 
+    // Validate addresses (basic validation)
+    if (pickupAddress.trim() === '' || deliveryAddress.trim() === '') {
+      console.log('Empty address strings found, skipping panel');
+      return null;
+    }
+
+    // Return the data with addresses
+    console.log('Returning address data for panel');
     return {
       start: pickupAddress,
       end: deliveryAddress,

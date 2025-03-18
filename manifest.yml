@@ -1,18 +1,19 @@
 modules:
-  jira:issuePanel:
-    - key: issue-panel-redirect-hello-world-panel
+  jira:issueContext:
+    - key: issue-panel-redirect
       resource: main
       resolver:
         function: resolver
-      viewportSize: small
       title: Delivery Route
+      label: Delivery Route
+      description: This app will help you find the best route to deliver your goods.
       icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
   function:
     - key: resolver
       handler: index.handler
 resources:
   - key: main
-    path: static/hello-world/build
+    path: static/issue-tracker-redirect/build
 permissions:
   scopes:
     - read:jira-work
