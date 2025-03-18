@@ -4,8 +4,8 @@ modules:
       resource: main
       resolver:
         function: resolver
-      viewportSize: medium
-      title: issue-panel-redirect
+      viewportSize: small
+      title: Delivery Route
       icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
   function:
     - key: resolver

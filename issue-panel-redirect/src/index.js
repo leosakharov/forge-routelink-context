@@ -3,20 +3,56 @@ import api, { route } from '@forge/api';
 const resolver = new Resolver();
 
 resolver.define('fetchIssueDetails', async (req) => {
-  const key = req.context.extension.issue.key;
+  try {
+    console.log('Fetching issue details...');
+    const key = req.context.extension.issue.key;
+    console.log(`Issue key: ${key}`);
 
-  const res = await api.asUser().requestJira(route`/rest/api/3/issue/${key}`);
-  const data = await res.json();
+    const res = await api.asUser().requestJira(route`/rest/api/3/issue/${key}`);
+    
+    if (!res.ok) {
+      console.error(`Failed to fetch issue data: ${res.status} ${res.statusText}`);
+      return null;
+    }
+    
+    const data = await res.json();
+    console.log('Issue data fetched successfully');
 
-  // In a real app, you would use the actual custom field IDs for start and end locations
-  // For this example, we'll use mock data if the custom fields don't exist
-  const startLocation = data.fields.customfield_startLocation || "55.676098,12.568337"; // Copenhagen
-  const endLocation = data.fields.customfield_endLocation || "55.673874,12.564581"; // Nearby location
+    // Get the issue status
+    const status = data.fields.status?.name?.toLowerCase() || '';
+    console.log(`Issue status: ${status}`);
+    const isRelevantStatus = status === 'planned' || status === 'ready for pick up';
+    
+    if (!isRelevantStatus) {
+      console.log('Issue status is not relevant, skipping panel');
+      return null;
+    }
 
-  return {
-    start: startLocation,
-    end: endLocation
-  };
+    // Get the pickup and delivery addresses from the custom fields
+    console.log('Checking for custom fields...');
+    console.log(`Custom fields available: ${Object.keys(data.fields).filter(key => key.startsWith('customfield_')).join(', ')}`);
+    
+    const pickupAddress = data.fields.customfield_10062 || '';
+    const deliveryAddress = data.fields.customfield_10063 || '';
+    
+    console.log(`Pickup address: ${pickupAddress}`);
+    console.log(`Delivery address: ${deliveryAddress}`);
+
+    // If addresses are missing, return null
+    if (!pickupAddress || !deliveryAddress) {
+      console.log('Missing address information, skipping panel');
+      return null;
+    }
+
+    return {
+      start: pickupAddress,
+      end: deliveryAddress,
+      isRelevantStatus: true
+    };
+  } catch (error) {
+    console.error('Error in fetchIssueDetails:', error);
+    return null;
+  }
 });
 
 export const handler = resolver.getDefinitions();
